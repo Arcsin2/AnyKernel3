@@ -235,6 +235,10 @@ repack_ramdisk() {
   fi;
 }
 
+is_mounted() {
+  mount | grep -q " $1 ";
+}
+
 # flash_boot (build, sign and write image only)
 flash_boot() {
   local varlist i kernel ramdisk fdt cmdline comp part0 part1 nocompflag signfail pk8 cert avbtype;
@@ -391,6 +395,20 @@ flash_boot() {
   elif [ "$(wc -c < boot-new.img)" -gt "$(wc -c < boot.img)" ]; then
     abort "New image larger than boot partition. Aborting...";
   fi;
+
+  # Security patch fixes (thanks to @corsicanu)
+  if is_mounted /system_root; then
+     system_path=/system_root/system;
+  else
+     system_path=/system;
+  fi;
+  bprop=$system_path/build.prop;
+  android=$(cat $bprop | tr '=' ' ' | grep ro.build.version.release | while read a b; do echo $b; done)
+  spatch=$(cat $bprop | tr '=' ' ' | grep ro.build.version.security_patch | while read a b; do echo $b; done)
+  ui_print "Detected android version as $android"
+  ui_print "Detected security patch as $spatch"
+  $bin/fiximg boot-new.img $android $spatch
+
   if [ -f "$bin/flash_erase" -a -f "$bin/nandwrite" ]; then
     $bin/flash_erase $block 0 0;
     $bin/nandwrite -p $block boot-new.img;
