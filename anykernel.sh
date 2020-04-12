@@ -4,7 +4,7 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=RZ Kernel for Exynos 9810 devices
+kernel.string=ProtonKernel for Exynos 9810
 do.devicecheck=1
 do.modules=0
 do.systemless=1

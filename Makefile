@@ -1,4 +1,4 @@
-NAME ?= RZ-OneUI2-exynos9810
+NAME ?= ProtonKernel
 
 DATE := $(shell date +'%Y%m%d-%H%M')
 
